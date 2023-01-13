@@ -1,0 +1,5 @@
+# node installed deps
+node_modules
+
+# built typescript files
+lib

@@ -1,0 +1,25 @@
+name: 'Headless GUI'
+description: 'Run cross-platform commands for headless GUI testing'
+inputs:
+  run:
+    description: 'commands to execute'
+    required: true
+  linux_pkgs:
+    description: 'additional packages to install on linux runner'
+    required: false
+    default: 'herbstluftwm'
+  linux_setup:
+    description: 'additional command to run on linux before the main section'
+    required: false
+    default: 'herbstluftwm'
+  linux_setup_delay:
+    description: 'time to wait after setup command (ms)'
+    required: false
+    default: 1000
+  linux_teardown:
+    description: 'additional command to run on linux after the main section'
+    required: false
+    default: 'herbstclient quit'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
