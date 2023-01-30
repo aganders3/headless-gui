@@ -4,10 +4,18 @@ import {
   ExecFileSyncOptions,
   SpawnSyncReturns,
 } from "child_process";
+import * as fs from "fs";
 import * as path from "path";
-import { expect, test } from "@jest/globals";
+import { beforeAll, expect, test } from "@jest/globals";
 
-// shows how the runner will run a javascript action with env / stdout protocol
+beforeAll(() => {
+  const options: fs.MakeDirectoryOptions = {
+    recursive: true,
+  };
+  fs.mkdirSync("/tmp/test-working-dir", options);
+  fs.mkdirSync("/tmp/test-compatibility-working-dir", options);
+});
+
 test("test runs", () => {
   const env: { [key: string]: string } = { ...process.env } as {
     [key: string]: string;
@@ -31,14 +39,16 @@ test("test working dir", () => {
     [key: string]: string;
   };
   env["INPUT_RUN"] = "pwd";
-  env["INPUT_WORKING_DIRECTORY"] = "/tmp";
+  env["INPUT_WORKING_DIRECTORY"] = "/tmp/test-working-dir";
   const options: ExecFileSyncOptions = {
     env: env,
   };
 
   const np = process.execPath;
   const ip = path.join(__dirname, "..", "lib", "main.js");
-  expect(execFileSync(np, [ip], options).toString()).toContain("/private/tmp");
+  expect(execFileSync(np, [ip], options).toString()).toContain(
+    "/tmp/test-working-dir"
+  );
 });
 
 test("test compatibility working dir", () => {
@@ -46,14 +56,16 @@ test("test compatibility working dir", () => {
     [key: string]: string;
   };
   env["INPUT_RUN"] = "pwd";
-  env["INPUT_WORKING-DIRECTORY"] = "/tmp";
+  env["INPUT_WORKING-DIRECTORY"] = "/tmp/test-working-dir";
   const options: ExecFileSyncOptions = {
     env: env,
   };
 
   const np = process.execPath;
   const ip = path.join(__dirname, "..", "lib", "main.js");
-  expect(execFileSync(np, [ip], options).toString()).toContain("/private/tmp");
+  expect(execFileSync(np, [ip], options).toString()).toContain(
+    "/tmp/test-working-dir"
+  );
 });
 
 test("test failing command", () => {
