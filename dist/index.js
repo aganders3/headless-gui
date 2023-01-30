@@ -103,8 +103,17 @@ function killAllXvfb(sig = 15) {
 function runCommands(commands, env) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = { env: env };
+        const working_dir = core.getInput("working_directory", { required: false });
+        const compatible_working_dir = core.getInput("working-directory", {
+            required: false,
+        });
+        if (working_dir) {
+            options.cwd = working_dir;
+        }
+        else if (compatible_working_dir) {
+            options.cwd = compatible_working_dir;
+        }
         for (const command of commands) {
-            // TODO: raise error if any fail (is this already done?)
             yield exec.exec(command, [], options);
         }
     });
@@ -129,14 +138,16 @@ function main() {
             }
         }
         catch (error) {
-            // TODO: mock this shit for tests
+            // TODO: upload /tmp/linux*output on failure?
             if (error instanceof Error)
                 core.setFailed(error.message);
             if (error instanceof Error)
                 console.log(error.message);
             // attempt to kill any remaining Xvfb - noop if there's an error at this point
             try {
-                yield killAllXvfb(9);
+                if (process.platform == "linux") {
+                    yield killAllXvfb(9);
+                }
             }
             catch (error) {
                 () => undefined;

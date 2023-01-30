@@ -75,8 +75,18 @@ async function killAllXvfb(sig = 15) {
 
 async function runCommands(commands: string[], env: { [key: string]: string }) {
   const options: exec.ExecOptions = { env: env };
+
+  const working_dir = core.getInput("working_directory", { required: false });
+  const compatible_working_dir = core.getInput("working-directory", {
+    required: false,
+  });
+  if (working_dir) {
+    options.cwd = working_dir;
+  } else if (compatible_working_dir) {
+    options.cwd = compatible_working_dir;
+  }
+
   for (const command of commands) {
-    // TODO: raise error if any fail (is this already done?)
     await exec.exec(command, [], options);
   }
 }
@@ -106,12 +116,14 @@ async function main() {
       await killAllXvfb();
     }
   } catch (error) {
-    // TODO: mock this shit for tests
+    // TODO: upload /tmp/linux*output on failure?
     if (error instanceof Error) core.setFailed(error.message);
     if (error instanceof Error) console.log(error.message);
     // attempt to kill any remaining Xvfb - noop if there's an error at this point
     try {
-      await killAllXvfb(9);
+      if (process.platform == "linux") {
+        await killAllXvfb(9);
+      }
     } catch (error) {
       () => undefined;
     }
