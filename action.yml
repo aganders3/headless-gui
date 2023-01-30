@@ -24,10 +24,6 @@ inputs:
     description: 'directory where commands from `run` will be executed - defaults to cwd'
     required: false
     default: ""
-  working-directory:
-    description: 'compatibility with GabrielBB/xvfb-action (working_dir takes precedence)'
-    required: false
-    default: ""
 runs:
   using: 'node16'
   main: 'dist/index.js'

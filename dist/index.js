@@ -104,14 +104,8 @@ function runCommands(commands, env) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = { env: env };
         const working_dir = core.getInput("working_directory", { required: false });
-        const compatible_working_dir = core.getInput("working-directory", {
-            required: false,
-        });
         if (working_dir) {
             options.cwd = working_dir;
-        }
-        else if (compatible_working_dir) {
-            options.cwd = compatible_working_dir;
         }
         for (const command of commands) {
             yield exec.exec(command, [], options);
