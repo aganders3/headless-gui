@@ -13,6 +13,7 @@ beforeAll(() => {
     recursive: true,
   };
   fs.mkdirSync("/tmp/test-working-dir", options);
+  fs.mkdirSync("/tmp/test-compatibility-working-dir", options);
 });
 
 test("test runs", () => {
@@ -39,6 +40,23 @@ test("test working dir", () => {
   };
   env["INPUT_RUN"] = "pwd";
   env["INPUT_WORKING_DIRECTORY"] = "/tmp/test-working-dir";
+  const options: ExecFileSyncOptions = {
+    env: env,
+  };
+
+  const np = process.execPath;
+  const ip = path.join(__dirname, "..", "lib", "main.js");
+  expect(execFileSync(np, [ip], options).toString()).toContain(
+    "/tmp/test-working-dir"
+  );
+});
+
+test("test compatibility working dir", () => {
+  const env: { [key: string]: string } = { ...process.env } as {
+    [key: string]: string;
+  };
+  env["INPUT_RUN"] = "pwd";
+  env["INPUT_WORKING-DIRECTORY"] = "/tmp/test-working-dir";
   const options: ExecFileSyncOptions = {
     env: env,
   };

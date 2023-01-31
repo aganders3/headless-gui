@@ -77,8 +77,13 @@ async function runCommands(commands: string[], env: { [key: string]: string }) {
   const options: exec.ExecOptions = { env: env };
 
   const working_dir = core.getInput("working_directory", { required: false });
+  const compatible_working_dir = core.getInput("working-directory", {
+    required: false,
+  });
   if (working_dir) {
     options.cwd = working_dir;
+  } else if (compatible_working_dir) {
+    options.cwd = compatible_working_dir;
   }
 
   for (const command of commands) {
