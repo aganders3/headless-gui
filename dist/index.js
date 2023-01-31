@@ -42,12 +42,32 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec = __importStar(__nccwpck_require__(514));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+/**
+ * Given a GitHub actions input name, get the value using either kebab-case
+ * (preferred) or snake_case. If neither is found, return empty string.
+ *
+ * @remarks
+ * If you *don't* want to fall back to checking the snake_case name, just use
+ * core.getInput directly.
+ *
+ * @param inputName - The name of the input (kebab-case)
+ * @param required - whether the input is required or optional [false]
+ */
+function getInputCompatible(input_name, required = false) {
+    core.debug(`getting input "${input_name}"`);
+    const val = core.getInput(input_name, { required: required });
+    const snake_name = input_name.replace(/-/g, "_");
+    const snake_val = core.getInput(snake_name, { required: required });
+    core.debug(`\t${input_name}: "${val}"`);
+    core.debug(`\t${snake_name}: "${snake_val}"`);
+    return val ? val : snake_val;
+}
 function installDeps(env) {
     return __awaiter(this, void 0, void 0, function* () {
         // TODO: add imagemagick for dump/convert the buffer
         const options = { env: env };
         console.log("::group::install linux_pkgs");
-        const linux_pkgs = core.getInput("linux_pkgs", { required: false });
+        const linux_pkgs = getInputCompatible("linux-pkgs");
         const pkgs = ["xvfb", ...linux_pkgs.split(" ")];
         console.log(`installing ${pkgs}`);
         yield exec.exec("sudo apt-get", ["update"], options);
@@ -58,10 +78,8 @@ function installDeps(env) {
 function linuxSetup(env) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("::group::running linux_setup");
-        const linux_setup = core.getInput("linux_setup", { required: false });
-        const linux_setup_delay = +core.getInput("linux_setup_delay", {
-            required: false,
-        });
+        const linux_setup = getInputCompatible("linux-setup");
+        const linux_setup_delay = +getInputCompatible("linux-setup-delay");
         const options = { env: env };
         yield exec.exec("bash", ["-c", `${linux_setup} > /tmp/linux-setup-output 2>&1 &`], options);
         console.log(`sleep for ${linux_setup_delay}ms`);
@@ -72,7 +90,7 @@ function linuxSetup(env) {
 function linuxTeardown(env) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("::group::running linux_teardown");
-        const linux_teardown = core.getInput("linux_teardown", { required: false });
+        const linux_teardown = getInputCompatible("linux-teardown");
         const options = { env: env };
         yield exec.exec("bash", ["-c", `${linux_teardown} > /tmp/linux-teardown-output 2>&1 &`], options);
         console.log("::endgroup::");
@@ -103,15 +121,9 @@ function killAllXvfb(sig = 15) {
 function runCommands(commands, env) {
     return __awaiter(this, void 0, void 0, function* () {
         const options = { env: env };
-        const working_dir = core.getInput("working_directory", { required: false });
-        const compatible_working_dir = core.getInput("working-directory", {
-            required: false,
-        });
+        const working_dir = getInputCompatible("working-directory");
         if (working_dir) {
             options.cwd = working_dir;
-        }
-        else if (compatible_working_dir) {
-            options.cwd = compatible_working_dir;
         }
         for (const command of commands) {
             yield exec.exec(command, [], options);

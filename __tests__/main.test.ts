@@ -13,10 +13,27 @@ beforeAll(() => {
     recursive: true,
   };
   fs.mkdirSync("/tmp/test-working-dir", options);
-  fs.mkdirSync("/tmp/test-compatibility-working-dir", options);
 });
 
 test("test runs", () => {
+  const env: { [key: string]: string } = { ...process.env } as {
+    [key: string]: string;
+  };
+  env["INPUT_RUN"] = "pwd";
+  env["INPUT_LINUX-PKGS"] = "twm";
+  env["INPUT_LINUX-SETUP"] = "twm";
+  env["INPUT_LINUX-SETUP-DELAY"] = "500";
+  env["INPUT_LINUX-TEARDOWN"] = "pkill ^twm";
+  const options: ExecFileSyncOptions = {
+    env: env,
+  };
+
+  const np = process.execPath;
+  const ip = path.join(__dirname, "..", "lib", "main.js");
+  expect(execFileSync(np, [ip], options).toString()).toContain(process.cwd());
+});
+
+test("test runs (compatibility inputs)", () => {
   const env: { [key: string]: string } = { ...process.env } as {
     [key: string]: string;
   };
@@ -35,23 +52,6 @@ test("test runs", () => {
 });
 
 test("test working dir", () => {
-  const env: { [key: string]: string } = { ...process.env } as {
-    [key: string]: string;
-  };
-  env["INPUT_RUN"] = "pwd";
-  env["INPUT_WORKING_DIRECTORY"] = "/tmp/test-working-dir";
-  const options: ExecFileSyncOptions = {
-    env: env,
-  };
-
-  const np = process.execPath;
-  const ip = path.join(__dirname, "..", "lib", "main.js");
-  expect(execFileSync(np, [ip], options).toString()).toContain(
-    "/tmp/test-working-dir"
-  );
-});
-
-test("test compatibility working dir", () => {
   const env: { [key: string]: string } = { ...process.env } as {
     [key: string]: string;
   };
