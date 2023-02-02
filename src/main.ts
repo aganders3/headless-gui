@@ -3,12 +3,33 @@ import * as exec from "@actions/exec";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Given a GitHub actions input name, get the value using either kebab-case
+ * (preferred) or snake_case. If neither is found, return empty string.
+ *
+ * @remarks
+ * If you *don't* want to fall back to checking the snake_case name, just use
+ * core.getInput directly.
+ *
+ * @param inputName - The name of the input (kebab-case)
+ * @param required - whether the input is required or optional [false]
+ */
+function getInputCompatible(input_name: string, required = false) {
+  core.debug(`getting input "${input_name}"`);
+  const val = core.getInput(input_name, { required: required });
+  const snake_name = input_name.replace(/-/g, "_");
+  const snake_val = core.getInput(snake_name, { required: required });
+  core.debug(`\t${input_name}: "${val}"`);
+  core.debug(`\t${snake_name}: "${snake_val}"`);
+  return val ? val : snake_val;
+}
+
 async function installDeps(env: { [key: string]: string }) {
   // TODO: add imagemagick for dump/convert the buffer
   const options: exec.ExecOptions = { env: env };
 
   console.log("::group::install linux_pkgs");
-  const linux_pkgs = core.getInput("linux_pkgs", { required: false });
+  const linux_pkgs = getInputCompatible("linux-pkgs");
   const pkgs = ["xvfb", ...linux_pkgs.split(" ")];
   console.log(`installing ${pkgs}`);
 
@@ -23,10 +44,8 @@ async function installDeps(env: { [key: string]: string }) {
 
 async function linuxSetup(env: { [key: string]: string }) {
   console.log("::group::running linux_setup");
-  const linux_setup = core.getInput("linux_setup", { required: false });
-  const linux_setup_delay = +core.getInput("linux_setup_delay", {
-    required: false,
-  });
+  const linux_setup = getInputCompatible("linux-setup");
+  const linux_setup_delay = +getInputCompatible("linux-setup-delay");
   const options: exec.ExecOptions = { env: env };
   await exec.exec(
     "bash",
@@ -40,7 +59,7 @@ async function linuxSetup(env: { [key: string]: string }) {
 
 async function linuxTeardown(env: { [key: string]: string }) {
   console.log("::group::running linux_teardown");
-  const linux_teardown = core.getInput("linux_teardown", { required: false });
+  const linux_teardown = getInputCompatible("linux-teardown");
   const options: exec.ExecOptions = { env: env };
   await exec.exec(
     "bash",
@@ -75,8 +94,13 @@ async function killAllXvfb(sig = 15) {
 
 async function runCommands(commands: string[], env: { [key: string]: string }) {
   const options: exec.ExecOptions = { env: env };
+
+  const working_dir = getInputCompatible("working-directory");
+  if (working_dir) {
+    options.cwd = working_dir;
+  }
+
   for (const command of commands) {
-    // TODO: raise error if any fail (is this already done?)
     await exec.exec(command, [], options);
   }
 }
@@ -106,12 +130,14 @@ async function main() {
       await killAllXvfb();
     }
   } catch (error) {
-    // TODO: mock this shit for tests
+    // TODO: upload /tmp/linux*output on failure?
     if (error instanceof Error) core.setFailed(error.message);
     if (error instanceof Error) console.log(error.message);
     // attempt to kill any remaining Xvfb - noop if there's an error at this point
     try {
-      await killAllXvfb(9);
+      if (process.platform == "linux") {
+        await killAllXvfb(9);
+      }
     } catch (error) {
       () => undefined;
     }

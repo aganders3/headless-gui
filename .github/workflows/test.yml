@@ -23,9 +23,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
+
       - uses: ./
+        name: "Run action from local source (./)"
         with:
           run: |
             echo "this is where your commands would run"
             echo "multiple commands are entered as multi-line input"
-          linux_setup_delay: 500
+          linux-setup-delay: 500

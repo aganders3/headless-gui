@@ -4,20 +4,43 @@ inputs:
   run:
     description: 'commands to execute'
     required: true
-  linux_pkgs:
+  linux-pkgs:
     description: 'additional packages to install on linux runner'
     required: false
     default: 'herbstluftwm'
-  linux_setup:
+  linux-setup:
     description: 'additional command to run on linux before the main section'
     required: false
     default: 'herbstluftwm'
-  linux_setup_delay:
+  linux-setup-delay:
     description: 'time to wait after setup command (ms)'
     required: false
     default: 1000
-  linux_teardown:
+  linux-teardown:
     description: 'additional command to run on linux after the main section'
+    required: false
+    default: 'herbstclient quit'
+  working-directory:
+    description: 'directory where commands from `run` will be executed - defaults to cwd'
+    required: false
+    default: ""
+  # snake_case alternatives for backward-compatibility
+  # not adding deprecation notice at this time, but it can be done with 
+  # <input_id>.deprecationMessage: "don't use this!"
+  linux_pkgs:
+    description: 'prefer `linux-pkgs`'
+    required: false
+    default: 'herbstluftwm'
+  linux_setup:
+    description: 'prefer `linux-setup`'
+    required: false
+    default: 'herbstluftwm'
+  linux_setup-delay:
+    description: 'prefer `linux-setup-delay`'
+    required: false
+    default: 1000
+  linux_teardown:
+    description: 'prefer `linux-teardown'
     required: false
     default: 'herbstclient quit'
 runs:
