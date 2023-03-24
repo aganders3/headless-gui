@@ -26,6 +26,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v2
 
@@ -39,10 +40,9 @@ jobs:
       - uses: ./
         name: "Run action from local source (./)"
         with:
-          shell: ${{ job.defaults.run.shell }}
+          shell: bash -el {0}
           run: |
             env
-            which conda
             which python
             conda run which python
             echo "this is where your commands would run"
