@@ -131,14 +131,15 @@ function runCommands(commands, env) {
             const [shell_bin, ...shell_args] = shell.split(" ");
             const placeholderIndex = shell_args.indexOf("{0}");
             for (const command of commands) {
-                const cmd = [...shell_args];
+                const args = [...shell_args];
                 if (placeholderIndex > 0) {
-                    cmd.splice(placeholderIndex, 1, "-c", command);
+                    args.splice(placeholderIndex, 1, "-c", command);
                 }
                 else {
-                    cmd.push("-c", command);
+                    args.push("-c", command);
                 }
-                yield exec.exec(shell_bin, cmd, options);
+                core.debug(`exec: args: ${shell_bin}, args: ${args}`);
+                yield exec.exec(shell_bin, args, options);
             }
         }
         else {
