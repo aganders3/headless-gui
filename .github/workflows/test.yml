@@ -39,6 +39,7 @@ jobs:
       - uses: ./
         name: "Run action from local source (./)"
         with:
+          shell: ${{ job.defaults.run.shell }}
           run: |
             env
             which conda

@@ -4,6 +4,10 @@ inputs:
   run:
     description: 'commands to execute'
     required: true
+  shell:
+    description: 'shell in which to execute commands from `run` input'
+    required: false
+    default: ""
   linux-pkgs:
     description: 'additional packages to install on linux runner'
     required: false
