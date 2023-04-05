@@ -105,12 +105,13 @@ function startXvfb(env) {
             const result = output.stdout.split("\n");
             console.log("sleep for 1000ms");
             yield sleep(1000);
+            console.log("::endgroup::");
             return [result[0], result[1]];
         }
         else {
+            console.log("::endgroup::");
             throw new Error(`failed to start Xvfb, exit code '${output.exitCode}'`);
         }
-        console.log("::endgroup::");
     });
 }
 function killAllXvfb(sig = 15) {
@@ -125,8 +126,26 @@ function runCommands(commands, env) {
         if (working_dir) {
             options.cwd = working_dir;
         }
-        for (const command of commands) {
-            yield exec.exec(command, [], options);
+        const shell = core.getInput("shell");
+        if (shell) {
+            const [shell_bin, ...shell_args] = shell.split(" ");
+            const placeholderIndex = shell_args.indexOf("{0}");
+            for (const command of commands) {
+                const args = [...shell_args];
+                if (placeholderIndex > 0) {
+                    args.splice(placeholderIndex, 1, "-c", command);
+                }
+                else {
+                    args.push("-c", command);
+                }
+                core.debug(`exec: args: ${shell_bin}, args: ${args}`);
+                yield exec.exec(shell_bin, args, options);
+            }
+        }
+        else {
+            for (const command of commands) {
+                yield exec.exec(command, [], options);
+            }
         }
     });
 }

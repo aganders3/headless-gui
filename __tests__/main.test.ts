@@ -68,6 +68,36 @@ test("test working dir", () => {
   );
 });
 
+test("test shell input", () => {
+  const env: { [key: string]: string } = { ...process.env } as {
+    [key: string]: string;
+  };
+  env["INPUT_RUN"] = "shopt -q login_shell && echo 'login shell'";
+  env["INPUT_SHELL"] = "bash -l {0}";
+  const options: ExecFileSyncOptions = {
+    env: env,
+  };
+
+  const np = process.execPath;
+  const ip = path.join(__dirname, "..", "lib", "main.js");
+  expect(execFileSync(np, [ip], options).toString()).toContain("login shell");
+});
+
+test("test shell input middle", () => {
+  const env: { [key: string]: string } = { ...process.env } as {
+    [key: string]: string;
+  };
+  env["INPUT_RUN"] = "shopt -q login_shell && echo 'login shell'";
+  env["INPUT_SHELL"] = "bash -l {0} -e";
+  const options: ExecFileSyncOptions = {
+    env: env,
+  };
+
+  const np = process.execPath;
+  const ip = path.join(__dirname, "..", "lib", "main.js");
+  expect(execFileSync(np, [ip], options).toString()).toContain("login shell");
+});
+
 test("test failing command", () => {
   const env: { [key: string]: string } = { ...process.env } as {
     [key: string]: string;
