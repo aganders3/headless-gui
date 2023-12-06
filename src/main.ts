@@ -135,8 +135,8 @@ async function main() {
 
     if (process.platform == "linux") {
       await installDeps(env);
-      const [pid, display] = await startXvfb(env);
-      console.log(`xvfb pid=${pid}, display=${display}`);
+      const [pid, display, screen] = await startXvfb(env);
+      console.log(`xvfb pid=${pid}, display=${display}, screen=${screen}`);
       env.DISPLAY = `:${display}`;
       await linuxSetup(env);
     }

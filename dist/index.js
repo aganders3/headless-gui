@@ -157,8 +157,8 @@ function main() {
             console.log(`running on ${process.platform}`);
             if (process.platform == "linux") {
                 yield installDeps(env);
-                const [pid, display] = yield startXvfb(env);
-                console.log(`xvfb pid=${pid}, display=${display}`);
+                const [pid, display, screen] = yield startXvfb(env);
+                console.log(`xvfb pid=${pid}, display=${display}, screen=${screen}`);
                 env.DISPLAY = `:${display}`;
                 yield linuxSetup(env);
             }

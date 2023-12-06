@@ -31,7 +31,7 @@ inputs:
   xvfb-screen-size:
     description: 'screen size passed to Xvfb'
     required: false
-    default: '1024x768x16'  # maybe not a great default, but this is what it was before
+    default: '1280x1024x24'
   # snake_case alternatives for backward-compatibility
   # not adding deprecation notice at this time, but it can be done with 
   # <input_id>.deprecationMessage: "don't use this!"
