@@ -82,7 +82,7 @@ async function startXvfb(env: { [key: string]: string }): Promise<string[]> {
     console.log("sleep for 1000ms");
     await sleep(1000);
     console.log("::endgroup::");
-    return [result[0], result[1]];
+    return [result[0], result[1], result[2]];
   } else {
     console.log("::endgroup::");
     throw new Error(`failed to start Xvfb, exit code '${output.exitCode}'`);

@@ -106,7 +106,7 @@ function startXvfb(env) {
             console.log("sleep for 1000ms");
             yield sleep(1000);
             console.log("::endgroup::");
-            return [result[0], result[1]];
+            return [result[0], result[1], result[2]];
         }
         else {
             console.log("::endgroup::");
