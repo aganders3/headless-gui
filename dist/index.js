@@ -100,7 +100,7 @@ function startXvfb(env) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("::group::starting XVfb");
         const options = { env: env };
-        const output = yield exec.getExecOutput("bash", [__nccwpck_require__.ab + "start-xvfb.bash"], options);
+        const output = yield exec.getExecOutput("bash", [__nccwpck_require__.ab + "start-xvfb.bash", core.getInput("xvfb-server-args")], options);
         if (output.exitCode == 0) {
             const result = output.stdout.split("\n");
             console.log("sleep for 1000ms");

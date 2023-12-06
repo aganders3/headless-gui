@@ -28,6 +28,10 @@ inputs:
     description: 'directory where commands from `run` will be executed - defaults to cwd'
     required: false
     default: ""
+  xvfb-server-args:
+    description: 'args passed to xvfb server'
+    required: false
+    default: '-screen 0, 1024x768x16'
   # snake_case alternatives for backward-compatibility
   # not adding deprecation notice at this time, but it can be done with 
   # <input_id>.deprecationMessage: "don't use this!"

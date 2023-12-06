@@ -74,7 +74,7 @@ async function startXvfb(env: { [key: string]: string }): Promise<string[]> {
   const options: exec.ExecOptions = { env: env };
   const output: exec.ExecOutput = await exec.getExecOutput(
     "bash",
-    [`${__dirname}/start-xvfb.bash`],
+    [`${__dirname}/start-xvfb.bash`, core.getInput("xvfb-server-args")],
     options
   );
   if (output.exitCode == 0) {
