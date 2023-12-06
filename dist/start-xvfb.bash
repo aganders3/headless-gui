@@ -21,9 +21,9 @@ find_free_servernum() {
 }
 
 SERVERNUM=$(find_free_servernum)
+SCREEN_SIZE=${1:-"1024x768x16"}
 
-# TODO: allow configuration of screen
-Xvfb :"$SERVERNUM" "$@" > /tmp/xvfb-output 2>&1 &
+Xvfb :"$SERVERNUM" -screen 0 "$SCREEN_SIZE" > /tmp/xvfb-output 2>&1 &
 
 echo "$!"
 echo "$SERVERNUM"
