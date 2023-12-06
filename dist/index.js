@@ -1,4 +1,4 @@
-require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 109:
@@ -100,7 +100,7 @@ function startXvfb(env) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("::group::starting XVfb");
         const options = { env: env };
-        const output = yield exec.getExecOutput("bash", [__nccwpck_require__.ab + "start-xvfb.bash"], options);
+        const output = yield exec.getExecOutput("bash", [__nccwpck_require__.ab + "start-xvfb.bash", core.getInput("xvfb-screen-size")], options);
         if (output.exitCode == 0) {
             const result = output.stdout.split("\n");
             console.log("sleep for 1000ms");
@@ -157,8 +157,8 @@ function main() {
             console.log(`running on ${process.platform}`);
             if (process.platform == "linux") {
                 yield installDeps(env);
-                const [pid, display] = yield startXvfb(env);
-                console.log(`xvfb pid=${pid}, display=${display}`);
+                const [pid, display, screen] = yield startXvfb(env);
+                console.log(`xvfb pid=${pid}, display=${display}, screen=${screen}`);
                 env.DISPLAY = `:${display}`;
                 yield linuxSetup(env);
             }
@@ -4304,4 +4304,3 @@ module.exports = require("util");
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map

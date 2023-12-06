@@ -74,7 +74,7 @@ async function startXvfb(env: { [key: string]: string }): Promise<string[]> {
   const options: exec.ExecOptions = { env: env };
   const output: exec.ExecOutput = await exec.getExecOutput(
     "bash",
-    [`${__dirname}/start-xvfb.bash`],
+    [`${__dirname}/start-xvfb.bash`, core.getInput("xvfb-screen-size")],
     options
   );
   if (output.exitCode == 0) {
@@ -135,8 +135,8 @@ async function main() {
 
     if (process.platform == "linux") {
       await installDeps(env);
-      const [pid, display] = await startXvfb(env);
-      console.log(`xvfb pid=${pid}, display=${display}`);
+      const [pid, display, screen] = await startXvfb(env);
+      console.log(`xvfb pid=${pid}, display=${display}, screen=${screen}`);
       env.DISPLAY = `:${display}`;
       await linuxSetup(env);
     }
